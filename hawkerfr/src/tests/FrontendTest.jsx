@@ -33,9 +33,26 @@ export default function FrontendTest() {
     longitude: 103.8198 // Default: Singapore coordinates
   });
   const [testProduct, setTestProduct] = useState(null);
+  const [isBrowser, setIsBrowser] = useState(false);
+  const [screenSize, setScreenSize] = useState({ width: 0, height: 0 });
+  const [userAgent, setUserAgent] = useState("");
+  
+  // Set isBrowser flag after component mounts to ensure window is available
+  useEffect(() => {
+    setIsBrowser(true);
+    if (typeof window !== 'undefined') {
+      setScreenSize({ 
+        width: window.innerWidth, 
+        height: window.innerHeight 
+      });
+      setUserAgent(window.navigator.userAgent);
+    }
+  }, []);
   
   // Run initial tests on component mount
   useEffect(() => {
+    if (!isBrowser) return;
+    
     // Check if key components are available
     const componentTests = {
       "StaticMap Component": !!StaticMap,
@@ -54,10 +71,10 @@ export default function FrontendTest() {
     
     // Test browser APIs
     const browserTests = {
-      "LocalStorage": !!window.localStorage,
-      "Geolocation": !!navigator.geolocation,
-      "Fetch API": !!window.fetch,
-      "Session Storage": !!window.sessionStorage
+      "LocalStorage": typeof window !== 'undefined' && !!window.localStorage,
+      "Geolocation": typeof window !== 'undefined' && !!window.navigator.geolocation,
+      "Fetch API": typeof window !== 'undefined' && !!window.fetch,
+      "Session Storage": typeof window !== 'undefined' && !!window.sessionStorage
     };
     
     setTestResults(prev => ({
@@ -67,7 +84,7 @@ export default function FrontendTest() {
     
     // Fetch a test product for cart testing
     fetchTestProduct();
-  }, []);
+  }, [isBrowser]);
   
   // Fetch a sample product for testing
   const fetchTestProduct = async () => {
@@ -147,7 +164,11 @@ export default function FrontendTest() {
     
     try {
       // Test hawkers API
-      const hawkersResponse = await locationAPI.getNearbyHawkerss(1.3521, 103.8198, 5000);
+      const hawkersResponse = await locationAPI.getNearbyHawkers({
+        latitude: 1.3521,
+        longitude: 103.8198,
+        radius: 5000
+      });
       results.hawkers = !!hawkersResponse.data;
     } catch (error) {
       results.hawkers = false;
@@ -216,7 +237,7 @@ export default function FrontendTest() {
   
   // Get user's current location
   const testUserLocation = () => {
-    if (!navigator.geolocation) {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
       toast.error("Geolocation is not supported by your browser");
       return;
     }
@@ -237,10 +258,31 @@ export default function FrontendTest() {
     );
   };
   
+  if (!isBrowser) {
+    return (
+      <div className="space-y-8 pb-12">
+        <div className="border-b border-gray-200 pb-5 mb-5">
+          <h1 className="text-3xl font-bold text-black">Frontend Test Suite</h1>
+          <p className="mt-2 text-sm text-gray-800">
+            Loading test environment...
+          </p>
+        </div>
+        
+        <Card>
+          <div className="py-12 flex items-center justify-center">
+            <div className="animate-pulse">
+              <p className="text-black">Initializing browser tests...</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+  
   return (
     <div className="space-y-8 pb-12">
       <div className="border-b border-gray-200 pb-5 mb-5">
-        <h1 className="text-3xl font-bold text-white">Frontend Test Suite</h1>
+        <h1 className="text-3xl font-bold text-black">Frontend Test Suite</h1>
         <p className="mt-2 text-sm text-gray-800">
           Test various frontend functionalities of the HawkerRoute application
         </p>
@@ -252,11 +294,11 @@ export default function FrontendTest() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           <div>
             <p className="font-medium text-black">User Agent:</p>
-            <p className="text-sm text-gray-800 break-words">{navigator.userAgent}</p>
+            <p className="text-sm text-gray-800 break-words">{userAgent}</p>
           </div>
           <div>
             <p className="font-medium text-black">Screen Resolution:</p>
-            <p className="text-sm text-gray-800">{window.innerWidth}x{window.innerHeight}</p>
+            <p className="text-sm text-gray-800">{screenSize.width}x{screenSize.height}</p>
           </div>
           <div>
             <p className="font-medium text-black">Authentication Status:</p>
@@ -285,7 +327,7 @@ export default function FrontendTest() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {testResults.components && Object.entries(testResults.components).map(([test, result]) => (
             <div key={test} className="flex items-center justify-between p-2 border-b border-gray-100">
-              <span className="text-gray-900 ">{test}</span>
+              <span className="text-gray-900">{test}</span>
               {result ? (
                 <span className="text-green-600 flex items-center font-medium">
                   <FiCheckCircle className="mr-1" /> Passed

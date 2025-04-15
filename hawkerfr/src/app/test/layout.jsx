@@ -2,9 +2,16 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useState, useEffect } from "react";
 
 export default function TestLayout({ children }) {
   const pathname = usePathname();
+  const [isMounted, setIsMounted] = useState(false);
+  
+  // Set mounted flag after hydration
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
   
   const navItems = [
     { path: "/test", label: "Overview" },
@@ -33,7 +40,7 @@ export default function TestLayout({ children }) {
       <div className="border-b border-gray-200 mb-6">
         <nav className="-mb-px flex space-x-6">
           {navItems.map((item) => {
-            const isActive = pathname === item.path;
+            const isActive = isMounted && pathname === item.path;
             return (
               <Link 
                 key={item.path} 

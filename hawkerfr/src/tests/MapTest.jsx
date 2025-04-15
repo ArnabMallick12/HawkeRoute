@@ -31,11 +31,20 @@ export default function MapTest() {
     viewingError: false,
     loadTime: null
   });
+  const [isBrowser, setIsBrowser] = useState(false);
+  
+  // Check if we're in browser environment after component mounts
+  useEffect(() => {
+    setIsBrowser(true);
+  }, []);
   
   // Load user's location on component mount
   useEffect(() => {
+    // Skip if not in browser environment
+    if (!isBrowser) return;
+    
     const getUserLocation = async () => {
-      if (!navigator.geolocation) {
+      if (typeof window === 'undefined' || !navigator.geolocation) {
         toast.error("Geolocation is not supported by your browser");
         return;
       }
@@ -58,7 +67,7 @@ export default function MapTest() {
     };
     
     getUserLocation();
-  }, []);
+  }, [isBrowser]);
   
   // Function to cycle through predefined locations
   const cycleLocation = (direction) => {
@@ -107,6 +116,11 @@ export default function MapTest() {
   
   // Function to test map loading time
   const testMapLoadTime = () => {
+    if (typeof window === 'undefined' || typeof performance === 'undefined') {
+      toast.error("Performance measurement not available");
+      return;
+    }
+    
     const startTime = performance.now();
     
     // Set random coordinates to force a re-render
@@ -125,10 +139,33 @@ export default function MapTest() {
     }, 100);
   };
   
+  // Show loading state during SSR
+  if (!isBrowser) {
+    return (
+      <div className="space-y-8 pb-12">
+        <div className="border-b border-gray-200 pb-5 mb-5">
+          <h1 className="text-3xl font-bold text-black">Map Component Testing</h1>
+          <p className="mt-2 text-sm text-gray-800">
+            Loading map testing environment...
+          </p>
+        </div>
+        
+        <Card>
+          <div className="py-12 flex items-center justify-center">
+            <div className="animate-pulse">
+              <FiMapPin className="text-orange-500 mx-auto mb-4" size={32} />
+              <p className="text-black">Initializing map tests...</p>
+            </div>
+          </div>
+        </Card>
+      </div>
+    );
+  }
+  
   return (
     <div className="space-y-8 pb-12">
       <div className="border-b border-gray-200 pb-5 mb-5">
-        <h1 className="text-3xl font-bold text-white">Map Component Testing</h1>
+        <h1 className="text-3xl font-bold text-black">Map Component Testing</h1>
         <p className="mt-2 text-sm text-gray-800">
           Test the map component with various locations and scenarios
         </p>

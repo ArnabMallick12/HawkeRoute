@@ -12,15 +12,22 @@ export default function StaticMap({
   showNavigation = true
 }) {
   const [address, setAddress] = useState("");
+  const [isBrowser, setIsBrowser] = useState(false);
+  
+  // Check if we're in browser environment
+  useEffect(() => {
+    setIsBrowser(true);
+  }, []);
   
   // Try to get address from coordinates using reverse geocoding
   useEffect(() => {
+    if (!isBrowser) return;
+    if (!latitude || !longitude) return;
+    
     const getAddress = async () => {
-      if (!latitude || !longitude) return;
-      
       try {
         // Use this API only in production, disable in development to avoid rate limits
-        if (process.env.NODE_ENV === 'production') {
+        if (typeof window !== 'undefined' && process.env.NODE_ENV === 'production') {
           const response = await fetch(
             `https://nominatim.openstreetmap.org/reverse?format=json&lat=${latitude}&lon=${longitude}&zoom=18&addressdetails=1`,
             { 
@@ -44,20 +51,21 @@ export default function StaticMap({
     };
     
     getAddress();
-  }, [latitude, longitude]);
+  }, [latitude, longitude, isBrowser]);
   
   const handleNavigate = () => {
     // Check if the device supports geolocation
-    if (navigator.geolocation) {
-      toast.success("Opening navigation to hawker location", {
-        icon: "🧭",
-      });
-      
-      // Open in Google Maps
-      window.open(`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`, '_blank');
-    } else {
+    if (typeof window === 'undefined' || !navigator.geolocation) {
       toast.error("Geolocation is not supported by this browser");
+      return;
     }
+    
+    toast.success("Opening navigation to hawker location", {
+      icon: "🧭",
+    });
+    
+    // Open in Google Maps
+    window.open(`https://www.google.com/maps/dir/?api=1&destination=${latitude},${longitude}`, '_blank');
   };
   
   if (!latitude || !longitude) {
@@ -97,8 +105,8 @@ export default function StaticMap({
           View on Google Maps
         </a>
         
-        {/* Navigation button */}
-        {showNavigation && (
+        {/* Navigation button - only show in browser */}
+        {isBrowser && showNavigation && (
           <button
             onClick={handleNavigate}
             className="mt-4 bg-orange-500 text-white px-4 py-2 rounded shadow-lg hover:bg-orange-600 transition-colors flex items-center"
