@@ -1,6 +1,7 @@
 /** @type {import('next').NextConfig} */
 
-const { withNetlify } = require('@netlify/next');
+// Import the Netlify plugin
+const nextOnNetlify = require('@netlify/next');
 
 const nextConfig = {
   images: {
@@ -19,4 +20,4 @@ const nextConfig = {
 };
 
 // Export the configuration
-module.exports = withNetlify(nextConfig);
+module.exports = nextConfig;
