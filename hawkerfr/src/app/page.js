@@ -65,7 +65,7 @@ export default function Home() {
               Order Products or Services
             </h3>
             <p className="text-gray-600">
-              Browse menus, select your favorite dishes, and place your order in
+              Browse menus, select your products or services, and place your order in
               minutes.
             </p>
           </div>
