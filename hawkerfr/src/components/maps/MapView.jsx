@@ -147,6 +147,7 @@ const MapView = ({ onSelectHawker }) => {
         userMarkerEl.style.backgroundImage =
           "url(https://docs.mapbox.com/mapbox-gl-js/assets/custom_marker.png)";
         userMarkerEl.style.width = "30px";
+        userMarkerEl.style.color = "#000000";
         userMarkerEl.style.height = "30px";
         userMarkerEl.style.backgroundSize = "100%";
         userMarkerEl.style.borderRadius = "50%";

@@ -229,7 +229,7 @@ const LocationPage = () => {
 
       {/* Hawker Details Modal */}
       {selectedHawker && (
-        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div className="fixed inset-0 bg-black text-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg max-w-md w-full p-6">
             <div className="flex justify-between items-start mb-4">
               <h3 className="text-xl font-bold">{selectedHawker.name}</h3>
@@ -241,9 +241,9 @@ const LocationPage = () => {
               </button>
             </div>
 
-            <div className="mb-4">
-              <p className="text-gray-600">{selectedHawker.category}</p>
-              <p className="flex items-center mt-1">
+            <div className="mb-4 text-black">
+              <p className="text-black">{selectedHawker.category}</p>
+              <p className="flex text-black items-center mt-1">
                 <span className="text-yellow-500 mr-1">★</span>
                 <span>{selectedHawker.rating}</span>
               </p>
@@ -254,7 +254,7 @@ const LocationPage = () => {
               )}
             </div>
 
-            <div className="flex justify-end">
+            <div className="flex text-black justify-end">
               <button
                 onClick={() =>
                   window.alert(`Directions to ${selectedHawker.name}`)
