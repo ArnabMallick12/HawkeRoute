@@ -6,6 +6,7 @@ const API_BASE_URL = "https://2355-2402-a00-10a-6c98-c836-b5d7-3c07-f9de.ngrok-f
 const api = axios.create({
   baseURL: API_BASE_URL,
   headers: {
+    "ngrok-skip-browser-warning": "any-value" ,
     "Content-Type": "application/json",
   },
 });
@@ -88,6 +89,7 @@ export const authAPI = {
 // Products API
 export const productsAPI = {
   getAllProducts: (params) => api.get("/api/products", { params }),
+
   getProductById: (productId) => api.get(`/api/products/${productId}`),
   createProduct: (productData) => api.post("/api/products", productData),
   updateProduct: (productId, productData) =>

@@ -29,7 +29,7 @@ export default function ProductsPage() {
       try {
         setLoading(true);
         const response = await productsAPI.getAllProducts();
-        console.log("----->", response.data.products);
+        console.log("----->", response);
         // Set products from API response
         
         if (response && response.data && Array.isArray(response.data.products)) {
