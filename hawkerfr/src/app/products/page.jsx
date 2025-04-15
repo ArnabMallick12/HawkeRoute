@@ -22,14 +22,18 @@ export default function ProductsPage() {
 
   // Fetch all products
   useEffect(() => {
+    console.log("Fetching products");
     const fetchProducts = async () => {
+     
+      console.log("Fetching products");
       try {
         setLoading(true);
         const response = await productsAPI.getAllProducts();
-
+        console.log("----->", response.data.products);
         // Set products from API response
-        if (response && response.data && Array.isArray(response.data)) {
-          setProducts(response.data);
+        
+        if (response && response.data && Array.isArray(response.data.products)) {
+          setProducts(response.data.products);
         } else if (response && response.data && response.data.status === "success" && Array.isArray(response.data.data)) {
           setProducts(response.data.data);
         } else {
